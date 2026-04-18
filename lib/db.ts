@@ -60,33 +60,41 @@ export interface GenerateTokenResult {
 }
 
 /**
- * UUIDv4を発行して clients テーブルにINSERTさせる。
- * Workerがまだ `/api/clients` を実装していない場合は、
- * ローカルでUUIDだけ発行して画面上で使う（MVP挙動）。
+ * Worker に clients 登録を依頼し、webhook_token を受け取る。
+ * Worker が未構成の場合はエラーを投げる（fail-close）。
  */
 export async function registerClient(params: {
   uid: string;
   name: string;
   email: string;
 }): Promise<GenerateTokenResult> {
-  const token = crypto.randomUUID();
-  // Worker側の登録API（未実装なら失敗するが、UIは続行する）
-  if (WORKER) {
-    try {
-      await fetch(`${WORKER}/api/clients`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ ...params, token }),
-      });
-    } catch {
-      // ignore — MVPではUUIDさえあれば設定フローを進められる
-    }
+  if (!WORKER || !SECRET) {
+    throw new Error('WORKER_API_URL / WORKER_INTERNAL_SECRET が未設定です');
   }
-  const base =
-    WORKER || 'https://omi-coaching-worker.YOUR_SUBDOMAIN.workers.dev';
+
+  const res = await fetch(`${WORKER}/api/clients`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error(`client registration failed: ${res.status}`);
+  }
+
+  const data = (await res.json()) as {
+    client?: { uid?: string; webhook_token?: string };
+  };
+  const token = data.client?.webhook_token;
+  if (!token) {
+    throw new Error('Worker did not return webhook_token');
+  }
+
+  const uidEnc = encodeURIComponent(params.uid);
+  const tokenEnc = encodeURIComponent(token);
   return {
     token,
-    webhookUrl: `${base}/webhook/audio?token=${token}`,
+    webhookUrl: `${WORKER}/webhook/memory?uid=${uidEnc}&token=${tokenEnc}`,
     createdAt: new Date().toISOString(),
   };
 }

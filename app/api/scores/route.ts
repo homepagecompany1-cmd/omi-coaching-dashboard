@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-
-export const runtime = 'edge';
-
 import { fetchDashboard } from '@/lib/db';
+import { sessionUserSchema } from '@/lib/validators';
 
 /**
  * GET /api/scores
@@ -15,13 +13,12 @@ import { fetchDashboard } from '@/lib/db';
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userResult = sessionUserSchema.safeParse(session?.user);
+  if (!userResult.success) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
-  const data = await fetchDashboard(
-    session.user.id,
-    session.user.name ?? 'あなた'
-  );
+  const user = userResult.data;
+  const data = await fetchDashboard(user.id, user.name ?? 'あなた');
   return NextResponse.json(data, {
     headers: { 'cache-control': 'no-store' },
   });

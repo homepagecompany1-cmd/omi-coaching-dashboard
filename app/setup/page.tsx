@@ -6,7 +6,6 @@ import { SiteFooter } from '@/components/site-footer';
 import { SetupClient } from '@/components/setup-client';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 async function checkSubscription(uid: string): Promise<boolean> {
   const WORKER = process.env.WORKER_API_URL;

@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-
-export const runtime = 'edge';
-
 import { registerClient } from '@/lib/db';
+import { sessionUserSchema } from '@/lib/validators';
 
 /**
  * POST /api/setup/generate-token
@@ -11,21 +9,20 @@ import { registerClient } from '@/lib/db';
  *
  * - UUIDv4を生成
  * - Workerの /api/clients にPOSTして clients テーブルへINSERT
- *   （Worker未実装ならMVPとしてローカルでUUIDだけ返す）
  * - Omi公式アプリに貼るWebhook URLを返す
  */
-
-
 export async function POST() {
   const session = await auth();
-  if (!session?.user?.id || !session.user.email) {
+  const userResult = sessionUserSchema.safeParse(session?.user);
+  if (!userResult.success) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
+  const user = userResult.data;
 
   const result = await registerClient({
-    uid: session.user.id,
-    name: session.user.name ?? 'OMIユーザー',
-    email: session.user.email,
+    uid: user.id,
+    name: user.name ?? 'OMIユーザー',
+    email: user.email,
   });
 
   return NextResponse.json(result);

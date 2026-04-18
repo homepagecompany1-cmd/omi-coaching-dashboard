@@ -6,7 +6,6 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 export default async function PricingPage() {
   const session = await auth();
