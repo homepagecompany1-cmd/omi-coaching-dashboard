@@ -40,3 +40,8 @@ next-env.d.ts
 
 # cloudflare
 .wrangler
+
+# macOS resource forks (外付けSSD対策)
+._*
+.!*
+
