@@ -1,6 +1,6 @@
-import { getServerSession } from 'next-auth';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
+
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { fetchHistory } from '@/lib/db';
@@ -8,9 +8,10 @@ import { HistoryTable } from '@/components/history-table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 export default async function HistoryPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     redirect('/api/auth/signin?callbackUrl=/history');
   }

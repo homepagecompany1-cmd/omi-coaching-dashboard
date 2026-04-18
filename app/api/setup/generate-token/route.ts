@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
+
+export const runtime = 'edge';
+
 import { registerClient } from '@/lib/db';
 
 /**
@@ -12,8 +14,10 @@ import { registerClient } from '@/lib/db';
  *   （Worker未実装ならMVPとしてローカルでUUIDだけ返す）
  * - Omi公式アプリに貼るWebhook URLを返す
  */
+
+
 export async function POST() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id || !session.user.email) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }

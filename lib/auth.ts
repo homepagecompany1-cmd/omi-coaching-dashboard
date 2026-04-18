@@ -1,13 +1,15 @@
-import type { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
+import NextAuth from 'next-auth';
+import Google from 'next-auth/providers/google';
 
 /**
- * NextAuth設定。Google OAuthで認証し、session.user.id に
+ * NextAuth v5 設定。Google OAuthで認証し、session.user.id に
  * Googleの sub (安定ID) を入れる。これを D1 の clients.uid と紐づける。
+ *
+ * Edge Runtime 対応（Cloudflare Workers/Pagesで動作）。
  */
-export const authOptions: NextAuthOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID ?? '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
     }),
@@ -19,7 +21,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account?.provider === 'google' && profile) {
-        // Googleの安定したユーザーIDを保持
         token.googleSub =
           (profile as { sub?: string }).sub ?? token.sub ?? token.googleSub;
       }
@@ -36,4 +37,5 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-};
+  trustHost: true, // Cloudflare背後で動作するため必須
+});

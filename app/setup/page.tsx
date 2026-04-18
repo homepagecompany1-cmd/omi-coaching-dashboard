@@ -1,11 +1,12 @@
-import { getServerSession } from 'next-auth';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
+
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { SetupClient } from '@/components/setup-client';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 async function checkSubscription(uid: string): Promise<boolean> {
   const WORKER = process.env.WORKER_API_URL;
@@ -27,7 +28,7 @@ async function checkSubscription(uid: string): Promise<boolean> {
 }
 
 export default async function SetupPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     // NextAuth経由でサインインへ。終了後この画面に戻る
     redirect('/api/auth/signin?callbackUrl=/setup');

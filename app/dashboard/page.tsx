@@ -1,6 +1,6 @@
-import { getServerSession } from 'next-auth';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
+
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { fetchDashboard } from '@/lib/db';
@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 function formatMinutes(total: number): string {
   const h = Math.floor(total / 60);
@@ -29,7 +30,7 @@ function formatMinutes(total: number): string {
 }
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     redirect('/api/auth/signin?callbackUrl=/dashboard');
   }
