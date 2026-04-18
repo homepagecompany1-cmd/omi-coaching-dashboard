@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 38 40% 96%;
+    --foreground: 215 40% 18%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 40% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 40% 18%;
+
+    --primary: 215 48% 20%;
+    --primary-foreground: 38 40% 96%;
+
+    --secondary: 32 49% 65%;
+    --secondary-foreground: 215 48% 15%;
+
+    --muted: 38 20% 90%;
+    --muted-foreground: 215 15% 40%;
+
+    --accent: 32 49% 65%;
+    --accent-foreground: 215 48% 15%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 38 40% 96%;
+
+    --border: 215 15% 85%;
+    --input: 215 15% 85%;
+    --ring: 32 49% 55%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 215 48% 10%;
+    --foreground: 38 40% 96%;
+    --card: 215 48% 14%;
+    --card-foreground: 38 40% 96%;
+    --popover: 215 48% 14%;
+    --popover-foreground: 38 40% 96%;
+    --primary: 32 49% 65%;
+    --primary-foreground: 215 48% 15%;
+    --secondary: 215 30% 25%;
+    --secondary-foreground: 38 40% 96%;
+    --muted: 215 30% 20%;
+    --muted-foreground: 38 20% 75%;
+    --accent: 32 49% 65%;
+    --accent-foreground: 215 48% 15%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 38 40% 96%;
+    --border: 215 30% 25%;
+    --input: 215 30% 25%;
+    --ring: 32 49% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'palt';
+  }
+}
+
+@layer components {
+  .brand-gradient {
+    background: linear-gradient(135deg, #1a2e4a 0%, #0f1d33 55%, #2a4266 100%);
+  }
+  .gold-gradient {
+    background: linear-gradient(135deg, #e6c49a 0%, #d4a574 50%, #b88754 100%);
+  }
+  .gold-text {
+    background: linear-gradient(135deg, #e6c49a 0%, #d4a574 50%, #b88754 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
